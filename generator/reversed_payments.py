@@ -49,7 +49,7 @@ def generate_reversed_payments(session: Session):
     for number, installment in enumerate(selected, start=1):
 
         payment = Payment(
-            payment_id=f"PAY-2026-{existing_count + number:07d}",
+            payment_id=f"PMT-2026-{existing_count + number:06d}",
             loan_id=installment.loan_id,
             payment_date=min(installment.due_date, SNAPSHOT_DATE),
             amount=installment.amount_due,

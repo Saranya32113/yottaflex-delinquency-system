@@ -1,0 +1,66 @@
+[
+    {
+        "anomaly_id": "ANOM-001",
+        "anomaly_type": "paid_off_loan_in_collection",
+        "entity_type": "CollectionCase",
+        "entity_id": "CASE-2026-0000001",
+        "related_entity_ids": [
+            "LOAN-2026-000001",
+            "ACC-2026-000001"
+        ],
+        "expected_validation": "A paid-off loan must not remain in an open collection case.",
+        "description": "Loan marked paid_off and account closed while collection case remains open.",
+        "injected_at": "2026-11-13T04:22:41.631139"
+    },
+    {
+        "anomaly_id": "ANOM-002",
+        "anomaly_type": "contact_outside_allowed_window",
+        "entity_type": "ContactAttempt",
+        "entity_id": "ATT-PTP-0000001",
+        "related_entity_ids": [
+            "PREF-2026-0000001"
+        ],
+        "expected_validation": "Contact attempts must fall within the customer's permitted contact window.",
+        "description": "Contact attempt moved to 22:30, outside the permitted 09:00-18:00 window.",
+        "injected_at": "2026-11-13T04:22:41.631139"
+    },
+    {
+        "anomaly_id": "ANOM-003",
+        "anomaly_type": "payment_allocated_to_wrong_installment",
+        "entity_type": "PaymentAllocation",
+        "entity_id": "ALLOC-2026-0000001",
+        "related_entity_ids": [
+            "PAY-2026-0000001",
+            "INS-LOAN-2026-000001-017",
+            "INS-LOAN-2026-000002-012"
+        ],
+        "expected_validation": "The payment and its allocated installment must belong to the same loan.",
+        "description": "Payment allocation reassigned to an installment belonging to a different loan.",
+        "injected_at": "2026-11-13T04:22:41.631139"
+    },
+    {
+        "anomaly_id": "ANOM-004",
+        "anomaly_type": "promise_amount_exceeds_arrears",
+        "entity_type": "PromiseToPay",
+        "entity_id": "PTP-2026-0000002",
+        "related_entity_ids": [
+            "SNAP-2026-0000003"
+        ],
+        "expected_validation": "Promised amount must not exceed the customer's current arrears.",
+        "description": "Promise amount deliberately increased to arrears plus 1000.",
+        "injected_at": "2026-11-13T04:22:41.631139"
+    },
+    {
+        "anomaly_id": "ANOM-005",
+        "anomaly_type": "disputed_debt_treated_as_confirmed",
+        "entity_type": "CollectionCase",
+        "entity_id": "CASE-2026-0000013",
+        "related_entity_ids": [
+            "SNAP-2026-0000013",
+            "LOAN-2026-000013"
+        ],
+        "expected_validation": "A disputed debt must remain under review and must not be treated as confirmed for collection.",
+        "description": "Collection case changed from review to open while its delinquency snapshot remains disputed.",
+        "injected_at": "2026-11-13T04:22:41.631139"
+    }
+]

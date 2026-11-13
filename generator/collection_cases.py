@@ -26,7 +26,10 @@ def calculate_priority_score(loan, snapshot):
         if principal > 0 else 0
     )
 
-    arrears_score = min(arrears_ratio / 0.30 * 25, 25)
+    arrears_score = min(
+        arrears_ratio / 0.30 * 25,
+        25
+    )
 
     # Outstanding balance score: maximum 15
     outstanding_ratio = (
@@ -34,7 +37,10 @@ def calculate_priority_score(loan, snapshot):
         if principal > 0 else 0
     )
 
-    balance_score = min(outstanding_ratio * 15, 15)
+    balance_score = min(
+        outstanding_ratio * 15,
+        15
+    )
 
     # Risk category score: maximum 20
     risk_scores = {
@@ -69,7 +75,9 @@ def generate_collection_cases(session):
         print("Skipping generation.")
         return
 
-    loans = session.query(Loan).all()
+    loans = session.query(Loan).order_by(
+        Loan.loan_id
+    ).all()
 
     snapshots = session.query(
         DelinquencySnapshot
@@ -82,7 +90,7 @@ def generate_collection_cases(session):
 
     cases = []
 
-    for index, loan in enumerate(loans, start=1):
+    for loan in loans:
 
         snapshot = snapshot_map.get(loan.loan_id)
 
@@ -104,7 +112,6 @@ def generate_collection_cases(session):
         else:
             priority_band = "low"
 
-        # Disputed and hardship cases require special handling
         if snapshot.disputed:
             case_status = "review"
             issue_type = "disputed_debt"
@@ -117,21 +124,25 @@ def generate_collection_cases(session):
             case_status = "open"
             issue_type = "overdue_installment"
 
+        case_number = len(cases) + 1
+
         case = CollectionCase(
-            case_id=f"CASE-2026-{index:07d}",
+            case_id=f"COL-2026-{case_number:06d}",
             loan_id=loan.loan_id,
             snapshot_id=snapshot.snapshot_id,
             priority_score=score,
             priority_band=priority_band,
             case_status=case_status,
-            opened_at=datetime(2026, 11, 13, 9, 0, 0),
+            opened_at=datetime(
+                2026, 11, 13, 9, 0, 0
+            ),
             issue_type=issue_type
         )
 
         cases.append(case)
 
-        if index % 1000 == 0:
-            print(f"Processed {index} loans")
+        if case_number % 1000 == 0:
+            print(f"Generated {case_number} cases")
 
     try:
         session.add_all(cases)

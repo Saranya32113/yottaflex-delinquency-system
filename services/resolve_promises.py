@@ -10,7 +10,6 @@ from database.models import (
     CollectionCase,
     Loan,
     Account,
-    Customer,
     ContactPreference,
     ContactAttempt,
     Payment,
@@ -18,7 +17,6 @@ from database.models import (
 )
 
 from config import RANDOM_SEED
-
 
 SNAPSHOT_DATE = date(2026, 11, 13)
 
@@ -42,7 +40,6 @@ def resolve_promises(session):
         print("No promises found.")
         return
 
-    # Prevent duplicate contact attempts and payment links
     existing_attempts = session.query(ContactAttempt).count()
     existing_links = session.query(
         PromisePaymentAllocation
@@ -57,7 +54,6 @@ def resolve_promises(session):
 
     rng = random.Random(RANDOM_SEED + 700)
 
-    # Build lookup maps
     case_ids = [p.case_id for p in promises]
 
     cases = session.query(CollectionCase).filter(
@@ -114,6 +110,9 @@ def resolve_promises(session):
     for payment in received_payments:
         payments_by_loan[payment.loan_id].append(payment)
 
+    # Count contact attempts separately for each case.
+    existing_counts = defaultdict(int)
+
     attempts = []
     payment_links = []
 
@@ -150,15 +149,12 @@ def resolve_promises(session):
 
         preference = preference_map.get(account.customer_id)
 
-        # Do not create an outbound attempt for restricted customers.
-        # Preserve their original future promise as pending.
         if preference is None or preference.do_not_contact:
             promise.promise_status = "pending"
             skipped_restricted += 1
             status_counts["pending"] += 1
             continue
 
-        # Create a historical contact attempt.
         days_before_snapshot = rng.randint(1, 45)
 
         attempted_date = (
@@ -171,7 +167,14 @@ def resolve_promises(session):
             time(10, 0)
         )
 
-        attempt_id = f"ATT-PTP-{index:07d}"
+        # Generate a case-specific immutable contact ID.
+        existing_counts[case.case_id] += 1
+
+        attempt_number = existing_counts[case.case_id]
+
+        attempt_id = (
+            f"CTP-{case.case_id}-{attempt_number:03d}"
+        )
 
         attempt = ContactAttempt(
             attempt_id=attempt_id,
@@ -186,7 +189,6 @@ def resolve_promises(session):
 
         attempts.append(attempt)
 
-        # Set a promise date 7 to 21 days after contact.
         promised_date = attempted_date + timedelta(
             days=rng.randint(7, 21)
         )
@@ -194,13 +196,11 @@ def resolve_promises(session):
         promise.attempt_id = attempt_id
         promise.promised_date = promised_date
 
-        # Future promises remain pending.
         if promised_date > SNAPSHOT_DATE:
             promise.promise_status = "pending"
             status_counts["pending"] += 1
             continue
 
-        # Find received payments within the promise period.
         matching_payments = [
             payment
             for payment in payments_by_loan[loan.loan_id]
@@ -212,14 +212,12 @@ def resolve_promises(session):
 
         remaining = money(promise.promised_amount)
 
-        # Link actual received payments to the promise.
         for payment in matching_payments:
 
             if remaining <= Decimal("0.00"):
                 break
 
             available = money(payment.amount)
-
             allocated = min(available, remaining)
 
             if allocated > 0:
@@ -233,7 +231,6 @@ def resolve_promises(session):
                 payment_links.append(link)
                 remaining = money(remaining - allocated)
 
-        # Determine the final promise status.
         if remaining <= Decimal("0.00"):
             promise.promise_status = "fulfilled"
             status_counts["fulfilled"] += 1

@@ -56,9 +56,6 @@ def generate_payments(session: Session):
 
             outcome = rng.random()
 
-            # 58% fully paid
-            # 20% partially paid
-            # 22% unpaid
             if outcome < 0.58:
                 amount_paid = amount_due
 
@@ -84,7 +81,7 @@ def generate_payments(session: Session):
                 )
 
                 payment_number += 1
-                payment_id = f"PAY-2026-{payment_number:07d}"
+                payment_id = f"PMT-2026-{payment_number:06d}"
 
                 payment = Payment(
                     payment_id=payment_id,
@@ -110,7 +107,6 @@ def generate_payments(session: Session):
                 payments.append(payment)
                 allocations.append(allocation)
 
-        # Store the installment's paid amount
         installment.amount_paid = amount_paid
 
         if amount_paid >= amount_due:
@@ -128,7 +124,7 @@ def generate_payments(session: Session):
         if index % 5000 == 0:
             print(f"Processed {index} installments")
 
-    # Add a small number of failed/reversed payment attempts.
+    # Generate failed payment attempts.
     # These do not reduce installment balances.
     for installment in installments:
 
@@ -141,7 +137,7 @@ def generate_payments(session: Session):
             )
 
             failed_payment = Payment(
-                payment_id=f"PAY-2026-{payment_number:07d}",
+                payment_id=f"PMT-2026-{payment_number:06d}",
                 loan_id=installment.loan_id,
                 payment_date=payment_date,
                 amount=money(installment.amount_due),

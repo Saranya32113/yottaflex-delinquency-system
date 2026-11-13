@@ -3,7 +3,7 @@
         "anomaly_id": "ANOM-001",
         "anomaly_type": "paid_off_loan_in_collection",
         "entity_type": "CollectionCase",
-        "entity_id": "CASE-2026-0000001",
+        "entity_id": "COL-2026-000001",
         "related_entity_ids": [
             "LOAN-2026-000001",
             "ACC-2026-000001"
@@ -16,7 +16,7 @@
         "anomaly_id": "ANOM-002",
         "anomaly_type": "contact_outside_allowed_window",
         "entity_type": "ContactAttempt",
-        "entity_id": "ATT-PTP-0000001",
+        "entity_id": "CTP-COL-2026-000001-001",
         "related_entity_ids": [
             "PREF-2026-0000001"
         ],
@@ -30,7 +30,7 @@
         "entity_type": "PaymentAllocation",
         "entity_id": "ALLOC-2026-0000001",
         "related_entity_ids": [
-            "PAY-2026-0000001",
+            "PMT-2026-000001",
             "INS-LOAN-2026-000001-017",
             "INS-LOAN-2026-000002-012"
         ],
@@ -54,7 +54,7 @@
         "anomaly_id": "ANOM-005",
         "anomaly_type": "disputed_debt_treated_as_confirmed",
         "entity_type": "CollectionCase",
-        "entity_id": "CASE-2026-0000013",
+        "entity_id": "COL-2026-000011",
         "related_entity_ids": [
             "SNAP-2026-0000013",
             "LOAN-2026-000013"

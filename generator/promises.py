@@ -3,17 +3,14 @@ import random
 from datetime import date, timedelta
 from decimal import Decimal, ROUND_HALF_UP
 
+from config import RANDOM_SEED
 from database.models import (
     CollectionCase,
-    ContactPreference,
     Loan,
-    Account,
-    Customer,
     DelinquencySnapshot,
     PromiseToPay
 )
 
-RANDOM_SEED = 20261022
 SNAPSHOT_DATE = date(2026, 11, 13)
 
 
@@ -33,6 +30,7 @@ def generate_promises(session):
     if existing > 0:
         print("Promise records already exist.")
         print("Existing records:", existing)
+        print("Skipping generation.")
         return
 
     rng = random.Random(RANDOM_SEED + 600)
@@ -43,7 +41,10 @@ def generate_promises(session):
             Loan,
             DelinquencySnapshot
         )
-        .join(Loan, CollectionCase.loan_id == Loan.loan_id)
+        .join(
+            Loan,
+            CollectionCase.loan_id == Loan.loan_id
+        )
         .join(
             DelinquencySnapshot,
             DelinquencySnapshot.snapshot_id
@@ -54,26 +55,22 @@ def generate_promises(session):
             DelinquencySnapshot.disputed.is_(False),
             DelinquencySnapshot.hardship_flag.is_(False)
         )
+        .order_by(CollectionCase.case_id)
         .all()
     )
 
     promises = []
 
-    eligible_records = [
-        record for record in records
-        if rng.random() < 0.25
-    ]
+    for case, loan, snapshot in records:
 
-    for index, (case, loan, snapshot) in enumerate(
-        eligible_records, start=1
-    ):
+        if rng.random() >= 0.25:
+            continue
 
         arrears = money(snapshot.total_arrears)
 
         if arrears <= 0:
             continue
 
-        # Promise amounts are bounded by arrears
         percentage = Decimal(
             str(round(rng.uniform(0.30, 1.00), 2))
         )
@@ -84,7 +81,6 @@ def generate_promises(session):
             days=rng.randint(1, 30)
         )
 
-        # Assign a status based on the promise date
         if promised_date < SNAPSHOT_DATE:
             promise_status = "missed"
         elif promised_date == SNAPSHOT_DATE:
@@ -92,8 +88,10 @@ def generate_promises(session):
         else:
             promise_status = "pending"
 
+        promise_number = len(promises) + 1
+
         promise = PromiseToPay(
-            promise_id=f"PTP-2026-{index:07d}",
+            promise_id=f"PTP-2026-{promise_number:07d}",
             case_id=case.case_id,
             attempt_id=None,
             promised_amount=promised_amount,

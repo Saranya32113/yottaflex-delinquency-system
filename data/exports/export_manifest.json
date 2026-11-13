@@ -1,0 +1,75 @@
+{
+    "database": "YottaFlex Delinquency Management System",
+    "export_format": [
+        "CSV",
+        "JSON",
+        "SQL"
+    ],
+    "tables": {
+        "audit_events": {
+            "row_count": 11074,
+            "csv_file": "audit_events.csv",
+            "json_file": "audit_events.json"
+        },
+        "customers": {
+            "row_count": 10000,
+            "csv_file": "customers.csv",
+            "json_file": "customers.json"
+        },
+        "accounts": {
+            "row_count": 10000,
+            "csv_file": "accounts.csv",
+            "json_file": "accounts.json"
+        },
+        "contact_preferences": {
+            "row_count": 10000,
+            "csv_file": "contact_preferences.csv",
+            "json_file": "contact_preferences.json"
+        },
+        "loans": {
+            "row_count": 10000,
+            "csv_file": "loans.csv",
+            "json_file": "loans.json"
+        },
+        "delinquency_snapshots": {
+            "row_count": 10000,
+            "csv_file": "delinquency_snapshots.csv",
+            "json_file": "delinquency_snapshots.json"
+        },
+        "installments": {
+            "row_count": 30000,
+            "csv_file": "installments.csv",
+            "json_file": "installments.json"
+        },
+        "payments": {
+            "row_count": 21556,
+            "csv_file": "payments.csv",
+            "json_file": "payments.json"
+        },
+        "collection_cases": {
+            "row_count": 7564,
+            "csv_file": "collection_cases.csv",
+            "json_file": "collection_cases.json"
+        },
+        "payment_allocations": {
+            "row_count": 20685,
+            "csv_file": "payment_allocations.csv",
+            "json_file": "payment_allocations.json"
+        },
+        "contact_attempts": {
+            "row_count": 1718,
+            "csv_file": "contact_attempts.csv",
+            "json_file": "contact_attempts.json"
+        },
+        "promises_to_pay": {
+            "row_count": 1787,
+            "csv_file": "promises_to_pay.csv",
+            "json_file": "promises_to_pay.json"
+        },
+        "promise_payment_allocations": {
+            "row_count": 484,
+            "csv_file": "promise_payment_allocations.csv",
+            "json_file": "promise_payment_allocations.json"
+        }
+    }
+}
